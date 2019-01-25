@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync/atomic"
 
 	"github.com/gorilla/websocket"
@@ -60,6 +61,14 @@ func (server *Server) generateHandleWS(ctx context.Context, cancel context.Cance
 
 		log.Printf("New client connected: %s, connections: %d/%d", r.RemoteAddr, num, server.options.MaxConnection)
 
+		// fmt.Printf("req: %# v\n", pretty.Formatter(r.Header))
+		info := r.Header.Get("X-Auth-User")
+		user, git := "unknown", "unknown"
+		infos := strings.Split(info, ",")
+		if len(infos) == 2 {
+			user, git = infos[0], infos[1]
+		}
+
 		if r.Method != "GET" {
 			http.Error(w, "Method not allowed", 405)
 			return
@@ -72,7 +81,7 @@ func (server *Server) generateHandleWS(ctx context.Context, cancel context.Cance
 		}
 		defer conn.Close()
 
-		err = server.processWSConn(ctx, conn)
+		err = server.processWSConn(ctx, conn, user, git)
 
 		switch err {
 		case ctx.Err():
@@ -87,7 +96,7 @@ func (server *Server) generateHandleWS(ctx context.Context, cancel context.Cance
 	}
 }
 
-func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) error {
+func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn, user, git string) error {
 	typ, initLine, err := conn.ReadMessage()
 	if err != nil {
 		return errors.Wrapf(err, "failed to authenticate websocket connection")
@@ -115,6 +124,10 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn) e
 		return errors.Wrapf(err, "failed to parse arguments")
 	}
 	params := query.Query()
+	params["user"] = []string{"user=" + user}
+	params["git"] = []string{"git=" + git}
+	fmt.Printf("got params: %v\n", params)
+
 	var slave Slave
 	slave, err = server.factory.New(params)
 	if err != nil {
