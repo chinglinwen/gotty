@@ -10,6 +10,8 @@
 
 GoTTY is a simple command line tool that turns your CLI tools into web applications.
 
+## Customized to working inside haodai, to working with gotty-logs, to provide k8s logs viewing.
+
 ![Screenshot](https://raw.githubusercontent.com/yudai/gotty/master/screenshot.gif)
 
 # Installation
