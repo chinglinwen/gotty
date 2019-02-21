@@ -126,7 +126,9 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn, u
 	params := query.Query()
 	params["user"] = []string{"user=" + user}
 	params["git"] = []string{"git=" + git}
-	fmt.Printf("got params: %v\n", params)
+
+	u, _, _ := ParseUserInfo(user)
+	fmt.Printf("got user: %v\n", u)
 
 	var slave Slave
 	slave, err = server.factory.New(params)

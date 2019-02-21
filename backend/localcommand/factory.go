@@ -1,7 +1,6 @@
 package localcommand
 
 import (
-	"fmt"
 	"strings"
 	"syscall"
 	"time"
@@ -65,6 +64,6 @@ func (factory *Factory) New(params map[string][]string) (server.Slave, error) {
 		argv = append(argv, "env="+env)
 	}
 
-	fmt.Printf("setting args: %v\n", argv)
+	// fmt.Printf("setting args: %v\n", argv)
 	return New(factory.command, argv, factory.opts...)
 }
