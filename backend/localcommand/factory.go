@@ -53,11 +53,11 @@ func (factory *Factory) New(params map[string][]string) (server.Slave, error) {
 	}
 	// fmt.Printf("arg after argv: %#v, params: %#v\n", argv, params)
 
+	if params["token"] != nil && len(params["token"]) > 0 {
+		argv = append(argv, params["token"][0])
+	}
 	if params["user"] != nil && len(params["user"]) > 0 {
 		argv = append(argv, params["user"][0])
-	}
-	if params["git"] != nil && len(params["git"]) > 0 {
-		argv = append(argv, params["git"][0])
 	}
 	if params["env"] != nil && len(params["env"]) > 0 {
 		env := params["env"][0]
