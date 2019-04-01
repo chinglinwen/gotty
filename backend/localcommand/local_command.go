@@ -1,6 +1,7 @@
 package localcommand
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"syscall"
@@ -28,8 +29,13 @@ type LocalCommand struct {
 	ptyClosed chan struct{}
 }
 
-func New(command string, argv []string, options ...Option) (*LocalCommand, error) {
+func New(command string, envs map[string]string, argv []string, options ...Option) (*LocalCommand, error) {
 	cmd := exec.Command(command, argv...)
+	cmd.Env = os.Environ()
+	for k, v := range envs {
+		fmt.Println("setting ", k, v)
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%v=%v", k, v))
+	}
 
 	pty, err := pty.Start(cmd)
 	if err != nil {

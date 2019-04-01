@@ -120,7 +120,7 @@ func (server *Server) processWSConn(ctx context.Context, conn *websocket.Conn, u
 	}
 	params := query.Query()
 	params["user"] = []string{"user=" + user}
-	params["token"] = []string{"token=" + usertoken}
+	params["token"] = []string{usertoken} //passing as env
 
 	// u, _, _ := ParseUserInfo(user)
 	fmt.Printf("got user: %v\n", user)

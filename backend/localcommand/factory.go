@@ -1,6 +1,7 @@
 package localcommand
 
 import (
+	"fmt"
 	"strings"
 	"syscall"
 	"time"
@@ -53,17 +54,31 @@ func (factory *Factory) New(params map[string][]string) (server.Slave, error) {
 	}
 	// fmt.Printf("arg after argv: %#v, params: %#v\n", argv, params)
 
+	var user, token string
+
 	if params["token"] != nil && len(params["token"]) > 0 {
-		argv = append(argv, params["token"][0])
+		//argv = append(argv, params["token"][0])
+		token = params["token"][0]
 	}
 	if params["user"] != nil && len(params["user"]) > 0 {
 		argv = append(argv, params["user"][0])
+		user = params["user"][0]
+	}
+	if params["git"] != nil && len(params["git"]) > 0 {
+		env := params["git"][0]
+		argv = append(argv, "git="+env)
 	}
 	if params["env"] != nil && len(params["env"]) > 0 {
 		env := params["env"][0]
 		argv = append(argv, "env="+env)
 	}
+	if token == "" {
+		fmt.Printf("error got empty token for %v", user)
+	}
+	envs := map[string]string{
+		"GOTTY_USERTOKEN": token,
+	}
 
 	// fmt.Printf("setting args: %v\n", argv)
-	return New(factory.command, argv, factory.opts...)
+	return New(factory.command, envs, argv, factory.opts...)
 }
