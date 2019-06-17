@@ -33,7 +33,7 @@ func New(command string, envs map[string]string, argv []string, options ...Optio
 	cmd := exec.Command(command, argv...)
 	cmd.Env = os.Environ()
 	for k, v := range envs {
-		fmt.Println("setting ", k, v)
+		// fmt.Println("setting ", k, v)
 		cmd.Env = append(cmd.Env, fmt.Sprintf("%v=%v", k, v))
 	}
 
