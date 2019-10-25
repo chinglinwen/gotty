@@ -6,6 +6,7 @@ import (
 	"syscall"
 	"time"
 
+	prettyjson "github.com/hokaccha/go-prettyjson"
 	"github.com/yudai/gotty/server"
 )
 
@@ -54,7 +55,7 @@ func (factory *Factory) New(params map[string][]string) (server.Slave, error) {
 	}
 	// fmt.Printf("arg after argv: %#v, params: %#v\n", argv, params)
 
-	var user, token string
+	var token, user string
 
 	if params["token"] != nil && len(params["token"]) > 0 {
 		//argv = append(argv, params["token"][0])
@@ -65,20 +66,31 @@ func (factory *Factory) New(params map[string][]string) (server.Slave, error) {
 		user = params["user"][0]
 	}
 	if params["git"] != nil && len(params["git"]) > 0 {
-		env := params["git"][0]
-		argv = append(argv, "git="+env)
+		argv = append(argv, "git="+params["git"][0])
 	}
 	if params["env"] != nil && len(params["env"]) > 0 {
-		env := params["env"][0]
-		argv = append(argv, "env="+env)
+		argv = append(argv, "env="+params["env"][0])
 	}
+	// for gotty-pod
+	if params["pod"] != nil && len(params["pod"]) > 0 {
+		argv = append(argv, "pod="+params["pod"][0])
+	}
+
+	pretty("params", argv)
+
 	if token == "" {
 		fmt.Printf("error got empty token for %v", user)
 	}
+
 	envs := map[string]string{
 		"GOTTY_USERTOKEN": token,
 	}
 
 	// fmt.Printf("setting args: %v\n", argv)
 	return New(factory.command, envs, argv, factory.opts...)
+}
+
+func pretty(prefix string, a interface{}) {
+	out, _ := prettyjson.Marshal(a)
+	fmt.Printf("%v: %s\n", prefix, out)
 }
