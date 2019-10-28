@@ -76,8 +76,6 @@ func (factory *Factory) New(params map[string][]string) (server.Slave, error) {
 		argv = append(argv, "pod="+params["pod"][0])
 	}
 
-	pretty("params", argv)
-
 	if token == "" {
 		fmt.Printf("error got empty token for %v", user)
 	}
